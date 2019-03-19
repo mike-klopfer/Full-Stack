@@ -47,13 +47,50 @@ Hello!
   
 ## 7. Current working directory (pwd)
 
-* 
+* The commmand `pwd` prints the working directory that the shell is currently looking at
+* When shell prints the working directory it separates directory names with a forward slash, like on url's for webpages
+* The entire string, composed of several directory names, which specifies our current directory is called a path
+* Special Directory names
+  * `..` parent directory
+  * `.` current directory
+  * `~` home directory
 
 ## 8. Parameters and options (ls -l)
 
+* Many shell commands support options or 'flags' which turn on special behavior associated with a command
+* Example: `ls -l` is an option to ls which prints out a more detail listing of files, the -l stands for long
+* Another Example: The `*.<type>` is called *Wildcard* syntax, and lists all files of type `<type>` in the current working directory (or whatever directory we specify with the ls command)
+  * So the command `$ ls -l Documents/*.pdf` will return a list of all files in the Documents directory whose filenames end in .pdf
+
 ## 9. Organizing your files (mkdir, mv)
 
+* To make directories and move files in a GUI we end up doing a lot of dragging and dropping
+* In a shell, we can do this with just a few commands
+  * `mkdir` is a command which makes a directory
+    * Note: we don't need to cd to a directory to make a sub-directory in it. Say we wanted to make a directory `Books` which will be contained in a directory `Documents`, which is in our home folder. So the path to the directory that we want to make would be `~/Documents/Books`. We can make the `Books` directory while in the home directory by typing the command `mkdir Documents/Books`.
+  * `mv` is a command which moves a directory or file
+    * In order to move something we need to specify where it is, (i.e. the current path to the file we want to move), and where its going, (i.e. the path to the *directory* we want to place the file in). 
+    * Continuting our previous example, lets assume we have a file `Awesome Book.pdf` which is located in `Documents`, and we want to move it to the new directory we created, `Books`. We would do this by typing `mv 'Documents/Awesome Book.pdf' Documents/Books`. (we use single quotes around the first path to avoid escaping the spaces)
+    * We could also move all items of a given file type from one directory to another using the wildcard, like so... `mv Documents/*.pdf Documents/Books`. This command would move all of our pdfs from `Documents` into `Documents/Books`.
+
+
 ## 10. Downloading (curl)
+
+* If we want to download files from the web we use the `curl` command
+  * stands for C-URL as in see-URL
+* Can use curl to get the source code for any webpage
+* Typing `curl 'http://google.com'` doesn't seem to work, it gets some HTML code which seems to want to send us somewhere else
+* Typing `curl -L 'http://google.com'` adds the flag `-L` which tells `curl` to follow redirects.
+  * This command will display the HTML for google in the terminal, but it doesn't save it anywhere useful
+  * To save the code or file somewhere we need to add the `-o` flag, and specify the name of the output file we want to write to
+    * Lets say we type 
+  ```
+  curl -o google.html -L 'http://google.com'
+  ```
+    * This would take all of the HTML for google.com and save it to a file called google.html, which shell will make in our current directory.
+* The structure of this last command is somewhat common in shell commands
+* We called a command `curl`, with a flag `-o` and two separate entities, where we want to put some data, and where we want to get the data that we want to put.
+
 
 ## 11. Viewing files (cat, less)
 
