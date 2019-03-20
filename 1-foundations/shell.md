@@ -94,16 +94,93 @@ Hello!
 
 ## 11. Viewing files (cat, less)
 
+* We can view the contents of a file as output in the terminal by typing `cat <filename>`
+  * cat is short for concatenate
+  * The trouble with this is that it shows the whole file at once, and this might display so much output that it fills multiple screens
+* Fortunately there is another command called `less`
+  * Works similar to `cat`, but we can view the content screen by screen, even scrolling up and down with the arrow keys
+  * We can also search for a specific word using the forward slash followed by the word we're looking for.
+  * In `less` we use q to quit when we're done viewing a particular file
+
+
 ## 12. Removing things (rm, rmdir)
+
+* `rm` is the command we use in shell to remove a file
+  * If we `rm` a file it is permenantly gone, no questions asked, no recycle bin
+  * We can get a little more warning by adding the -i flag
+* `rmdir` is the command we use to remove a directory
 
 ## 13. Searching and pipes (grep, wc)
 
+* `grep` is a shell command which allows us to search through a text file to find a line which contains a given (input) string. 
+  * We use `grep` as follows: `$ grep <string to find> <file to search>
+  * As we saw with `cat`, this will output all of the matching strings to the terminal, which might be more than we can handle.
+* We use the pipe `|` to join two commands together, and pass data in between them
+  * In the case of `grep`, we would like to pass the output to `less` so that we can have an easier time seeing what is returned.
+  * Example: Assume we have a text file called `dictionary.txt`, and we want to search it for any word which contains the string 'shell', then send this output to `less` we would type...
+```
+$ grep shell 'dictionary.txt' | less
+```     
+  * The lines containing 'shell' would be immediately displayed in `less`, with operation as expected in that program.
+
+* `grep` can also operate on input from another program (like `curl`), so we can pass data directly to `grep` from the web, without having to save it in a local file first.
+  * Example: in the command below, the output from the `curl` command gets sent directly to the `grep fish` command
+```
+curl -L https://tinyurl.com/zeyq9vc | grep fish
+```
+* We could also pipe this data directly to `wc` to get a count of the number of returned words, or use the `-c` (for count) flag with grep to do the same thing
+
 ## 14. Shell and environment variables
+
+* The shell is a little programming language, and so it also has variables
+* We can assign values to the variable using the equals sign, but with no spaces:
+```
+$ numbers='one two three'
+$ echo $numbers
+one two three
+```
+* Here we place a dollar sign in front of the variable when we want to refer to it, and we can see that using echo with it returns the value we stored.
+* There are two different kind of variables...*Shell variables* like the numbers we made above...and
+* *Environment variables*
+  * These environment variables are shared with programs that we run from within the shell
+  * The `PATH` variable is an example of this
+    * We can see the PATH variable by typing `$PATH`
+  * The purpose of the `PATH` variable is to tell shell where the program files are so when we type a command, it knows where to look to find the command we want to run
+  * Often, the shell commands will be in the `/bin` directory
+  * Sometimes we need to add on to the `PATH` variable so that shell knows to look somewhere else for new commands
+    * The directories in the `PATH` variable are separated by colons, and shell searches them left to right
+    * If we need to add the new directory to the end of `PATH` we do it by typing `$ PATH=$PATH:/new/dir/here`
+    * This change will only last until we close the current terminal
 
 ## 15. Startup files (.bash_profile)
 
+* Files containing shell commands are called *shell scripts*
+  * This course won't cover much shell programming
+* There is one file that is very usable to everyone who uses the shell
+  * This is the shell configuration file
+    * Most common use of config file is to add the /bin directory to `PATH`
+  * There are a few different files that shell uses as configuration files
+  * On Mac (or Windoes with git bash) the config file is `.bash_profile`
+    * ...and we can access this file from any directory by typing `open .bash_profile`
+  * On Linux the .bash_profile is only used for login shell sessions
+    * Non-login shell sessions use `.bashrc` as the config file
+* Any Command we put into the config file will automatically be run everytime we start the terminal
+
+
 ## 16. Controlling the shell prompt ($PS1)
 
+* When we start a terminal we see a shell prompt
+* We can change our shell prompt in the config file (`.bash_profile)
+  * By changin the `PS1` shell variable we can change what is displayed in the prompt
+  * The bash manual...`$ bash man`...gives us information on what we can put in the prompt (amogst other things)
+  * There is a website available (http://bashrcgenerater.com) which we can use to construct long and complicated prompts
+
 ## 17. Aliases
+
+* Use the `alias` command to assign a long command to a short command
+  * Example: If we type `$ alias ll='ls -la'` then everytime we type `ll` at the prompt shell interprets it as if we had typed `ls -la`. 
+* To see a list of all currently assigned aliases, just type `alias` at the prompt
+* The aliased commands last only as long as the terminal window is open
+  * As usual, we can make them sticky by adding them to the .bash_profile
 
 ## 18. Keep learning!
