@@ -1,5 +1,7 @@
 # Git Notebook
 
+# Version Control
+
 ## What is Version Control
 
 Version control is a set of programming tasks combined with some code which when used together allows tracking of changes to a codebase over time and across multiple programmers. Git implements distributed version control in which a codebase can be replicated in a local repository at the workstation of each person working on the code.
@@ -71,7 +73,6 @@ So in a normal git workflow we would
 We'll talk in more detail about the specific syntax later, but this is a generic
 look at how we would use git as part of our workflow.
 
-
 ## Getting Started
 
 * Create account at github.com
@@ -82,6 +83,9 @@ look at how we would use git as part of our workflow.
 $ git config --global user.name <your    name here>
 $ git config --global user.email<your email here> 
 ```
+
+
+# Create a Repository
 
 ## Creating First Repository
 
