@@ -4,7 +4,7 @@
 
 ## What is Version Control
 
-Version control is a set of programming tasks combined with some code which when used together allows tracking of changes to a codebase over time and across multiple programmers. Git implements distributed version control in which a codebase can be replicated in a local repository at the workstation of each person working on the code.
+Version control is a set of programming tasks combined with some code which when used together allows tracking of changes to a codebase over time and across multiple programmers. Git implements *distributed version control*, in which a codebase can be replicated in a local repository at the workstation of each person working on the code.
 
 ## Version Control in Daily Use
 
@@ -80,8 +80,8 @@ look at how we would use git as part of our workflow.
 * Set config values
   * Set up our local system with the useer name and email we plan to use:
 ```
-$ git config --global user.name <your    name here>
-$ git config --global user.email<your email here> 
+$ git config --global user.name <your name here>
+$ git config --global user.email <your email here> 
 ```
 
 
@@ -105,15 +105,15 @@ $ git config --global user.email<your email here>
 * Now that we've specified which directory we want to track, we need to indicate 
   to git that we intend to stage all of the files in the directory for storage 
   in the remote repository.
-  * We can do this using `$ git add -A` or `$ git add .`
-    * The `-A` flag adds all files and directories in the current working directory, and the `.` refers to the current working directory.
+  * We'll see how to do this soon using `$ git add`, but first we'll take a quick detour to see how we can *clone* a repository from outside of our local directory, and find out the status of whatever repository we happen to be working in.
 
 ## Clone an Existing Repository
+* *add stuff here*
 
 ## Determine a Repository's Status
 
 * We do this with `$ git status`
-  * Returns info about what state git is in, specifically
+  * Returns info about what state our repository is in, specifically:
     * What branch we are on
     * If the branch of our local repository is up-to-date with the remote (master) repository
     * Whether we have any un-tracked (not-staged) changes
@@ -126,12 +126,10 @@ $ git config --global user.email<your email here>
 ## Reviewing a Repository's History
 
 * Git autmatically records the date and time of every commit
-* Top help us track what we've done in our project, its useful to make commits often with descriptive messages
-
-
+* To help us track what we've done in our project, its useful to make commits often with descriptive messages
 * We can use `$ git log` to see what we've done in the past
-  * This gives usa list of all the commits in the current repository, who made them, when they were made, and the SHA associated with the commit
-  * Display in reverse chronological order (newest to oldest)
+  * This gives us a list of all the commits in the current repository, who made them, when they were made, and the SHA associated with the commit
+  * Displays in reverse chronological order (newest to oldest)
   * Scrollable
   * Exit by pressing `q, Enter`
 * Some useful flags wtih `git log`:
@@ -140,21 +138,28 @@ $ git config --global user.email<your email here>
   * `--patch`: display, for each commit EXACTLY what lines were added and deleted (press `Enter` to get more out put, then scrollable)
 
 * We can also use `$ git show` to view a specific commit
-  * Without an additional argument shoes the last commit
-  * Can see an specific commit by adding the SHA after show...`git show fdf5493`
-  * The output is the same as the `git log --patch`, but for only one commit
+  * Without an additional argument, this shows the last commit
+  * We Can see an specific commit by adding the SHA after show...`git show fdf5493`
+  * The output is the same as the `git log --patch`, but for only a single commit
 
 
 ## Add Commits to a Repository
 
-* `git add`
-  * Write some stuff
-* `git commit`
-  * Write some stuff about commits
+* Before we commit anything, its useful to check the status to see which files have changes, and to understand the curernt state of our repository.
+* Staging files with `git add`
+  * We have some files that we want Git to start tracking
+  * For Git to track a file it needs to be committed to the repository
+  * For a file to be committed, it needs to be in the staging index
+  * `git add` followed by a list of filenames (separated by a space) moves the specified files into the staging area
+    * Note: if we stage the wrong files, we can 'unstage' by using `git reset`, and then restaging the correct files
+  * Rather than specifying individual files to stage, we can also stage the entire directory with the `-A` flag or the `.` special character
+* Commiting files with `git commit`
+  * Once we've added all of the files we want to commit to the staging area, we should run `git status` one more time to make sure the staged files are the ones we want to commit
+  * When we're ready to commit, we type `git commit -m [commit message here]`
   * Writing commit messages
     * Each commit subject line should be able to answer the following question:
     * If applied this commit will *[your subject line here]*
-    * Then the structure of the commit should be as follows:
+    * The structure of the commit should be as follows:
 ```
 Imperative commit title (limited to 50 characters)
 # Blank line
@@ -162,3 +167,4 @@ Imperative commit title (limited to 50 characters)
 - List of key points and updates that the commit provides
 - Lines need to be manually wrapped at 72 characters
 ```
+* When our commit message is complete, we press `Enter` to commit the files and message to the local repository!
