@@ -123,7 +123,9 @@ $ git config --global user.email <your email here>
     * add these later
 
 
-## Reviewing a Repository's History
+# Reviewing a Repository's History
+
+## Display a Repository's Commits
 
 * Git autmatically records the date and time of every commit
 * To help us track what we've done in our project, its useful to make commits often with descriptive messages
@@ -143,7 +145,9 @@ $ git config --global user.email <your email here>
   * The output is the same as the `git log --patch`, but for only a single commit
 
 
-## Add Commits to a Repository
+# Add Commits to a Repository
+
+## Git Add
 
 * Before we commit anything, its useful to check the status to see which files have changes, and to understand the curernt state of our repository.
 * Staging files with `git add`
@@ -153,9 +157,13 @@ $ git config --global user.email <your email here>
   * `git add` followed by a list of filenames (separated by a space) moves the specified files into the staging area
     * Note: if we stage the wrong files, we can 'unstage' by using `git reset`, and then restaging the correct files
   * Rather than specifying individual files to stage, we can also stage the entire directory with the `-A` flag or the `.` special character
+
+## Git Commit
+
 * Commiting files with `git commit`
   * Once we've added all of the files we want to commit to the staging area, we should run `git status` one more time to make sure the staged files are the ones we want to commit
-  * When we're ready to commit, we type `git commit -m [commit message here]`
+  * When we're ready to commit, we type `git commit `
+  * Once we do this a vim editor will open, and we can type our commit message (witih the format as previously discussed)
   * Writing commit messages
     * Each commit subject line should be able to answer the following question:
     * If applied this commit will *[your subject line here]*
@@ -167,4 +175,63 @@ Imperative commit title (limited to 50 characters)
 - List of key points and updates that the commit provides
 - Lines need to be manually wrapped at 72 characters
 ```
-* When our commit message is complete, we press `Enter` to commit the files and message to the local repository!
+* When our commit message is complete, we press save the message to commit the files and message to the local repository!
+
+## Git Diff
+
+* `git diff` tells us what uncommitted changes exist in our project
+* An example of when this might be useful is if we are working on our project, and are interrupted, but forget to commit the changes we had made. When we come back to continue working we've forgotten exactly what we changed, and as we know from our lesson on commit messages, its important to know what we've done so that we can write accurate commit messages.
+* `git diff` gives us the same output as `git log -patch`, which is
+  * The files that have been modified
+  * The location of lines that have been added or removed
+  * The acutal (character by character) changes that have been made
+
+## Having Git Ignore files
+
+* Often when we want to commit multiple file changes, we'll use `git add .` to stage everything in the cwd
+* A `.gitignore` file enables us to use this simpple syntax AND still exclude certain files from being staged
+  * A `.gitignore` file is just a text file with a list of the names of files in the directory that we don't want Git to track
+  * In a `.gitignore` we can also use wildcards (to ignore all instances of a certain type of file)...and...
+  * ...regular expressions, to ignore files with a certain structure to their name, `.gitignore` uses the following conventions:
+    * Blank lines for spacing
+    * `#` is a comment
+    * `*` matches 0 or more characters
+    * `?` matches 1 character
+    * `[abc]` - match a, or b, or c
+    * `**` - matches nested directories - `a/**/z` matches
+      * `a/z`
+      * `a/b/z`
+      * `a/b/c/z`
+    * Example: Assuming we have 50 pictures in our project directory, and that we don't want Git to track any of them. They are all `.jpg`, and all in a subdirectory called `samples`. We would use `samples/*.jpg` in our `.gitignore` file to accomplish this.
+
+# Tagging, Branching, and Merging
+
+## Git Tag
+
+* At some point in the course of working on our project, our code will reach a state where it is functional: running with all major required features, and having had the required amount of testing completed. The code may still have undiscovered bugs, but at this point we would say it is a 'releasable' version, and we might to label this as version 1.0.
+* To do this, we would use the `git tag` commmand:
+* Assuming the most recent commit is what we consider to be v1.0
+* Then to tag this most recent commit with the appropriate tag we type:
+  * `$ git tag -a v1.0`
+    * The `-a` flag is the *annotate* version, which includes quite a bit more information about the commit that we've tagged, and is preferred in almost all cases.
+    * We can optionally add a `-m` flag with a message, or leave it off and have Git take us into the editor to add a message if we want to add a detailed message.
+* If we need to tag a previous commit we simply add the SHA (or part of it) after the tag like so:
+  * `$ git tag -a v0.9 a39ckrkf9`
+* Finally, we can use `git tag` on its own to display a list of all the tags associated with our repository.
+* A Tag can be deleted by typing:
+  * `$ git tag -d v1.0`
+
+## Git Branching
+
+* By default the first branch name is master
+* When a commit is made, its added to the *branch*, and the *branch pointer* moves to point at it.
+  * Thus, a branch pointer always points at the most recent commit on the branch, in contrast to a tag pointer, which stays fixed on a single commit.
+* *Branches* let us work on the same project in different, isolated environments
+* The *Head* pointer is an additional pointer, 
+  * The Head pointer always points to the branch that is active, and...
+  * We can change where Head is pointed using the `git checkout` command
+* Our commits are always added to wherever the head pointer is pointing
+  * Its imporant to note that as we add commits to a certain branch, other branches do NOT get any of the changes we have made (until we merge the branches...which we'll cover later)
+  * We can also create branches from any past or current commits...so if we find a problem in our code which has propogated through several commits, we can go back to the last commit that doesn't have the error, and work forward from there.
+
+
