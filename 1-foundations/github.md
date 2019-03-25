@@ -2,6 +2,25 @@
 
 # Version Control
 
+## Quick Summary
+
+* Setup
+  * `git config`
+  * `git init`
+* Repository Status
+  * `git status`
+  * `git log`
+  * `git diff`
+* Basic Committing
+  * `git add`
+  * `git reset`
+  * `git commit`
+* Taggging, Branching, Merging
+  * `git tag`
+  * `git branch` 
+  * `git merge`
+  * `git checkout`
+
 ## What is Version Control
 
 Version control is a set of programming tasks combined with some code which when used together allows tracking of changes to a codebase over time and across multiple programmers. Git implements *distributed version control*, in which a codebase can be replicated in a local repository at the workstation of each person working on the code.
@@ -223,6 +242,8 @@ Imperative commit title (limited to 50 characters)
 
 ## Git Branching
 
+### What is Branching?
+
 * By default the first branch name is master
 * When a commit is made, its added to the *branch*, and the *branch pointer* moves to point at it.
   * Thus, a branch pointer always points at the most recent commit on the branch, in contrast to a tag pointer, which stays fixed on a single commit.
@@ -234,4 +255,44 @@ Imperative commit title (limited to 50 characters)
   * Its imporant to note that as we add commits to a certain branch, other branches do NOT get any of the changes we have made (until we merge the branches...which we'll cover later)
   * We can also create branches from any past or current commits...so if we find a problem in our code which has propogated through several commits, we can go back to the last commit that doesn't have the error, and work forward from there.
 
+### The `git branch` command
+
+* The `git branch` command is used to interact with Git's branches
+* It can be used to 
+  * list all branch names in the repository
+    * We use `git branch` with no other arguments to do this
+  * create new branches
+  * delete branches
+
+### Create a Branch
+
+* Using `git branch <branch-name>`
+* After we create a branch, the head pointer stays where it was until we change it...it does NOT automoatically switch to the new branch
+
+### The `git checkout` command
+
+* This command will:
+  * remove all files and directories from the current working directory that Git is tracking (files that Git tracks are stored in the repository, so nothing is lost as long as our commits are up to date)...and...
+  * ...got into the repository and pull out all of the files and directories of the commit that the branch points to
+* Since this command removes all of the files that are reference by commits, its important to commit any changes and run `git status` before we `git checkout`
+* In some cases, two branches will point at the same commit, and the only way to know which branch we are on is to run `git status`, `git log`, `git branch`, or to look at our prompt (if we have it configured to display this)
+
+### Branches in the Log
+
+* We can very clearly see branch information in the log if we type `git log --decorate`
+
+### The Active Branch
+
+* Depending on how we have our .bash_profile (or .bashrc) set up, the command prompt will display the active branch.
+* If we don't have our prompt confiured, the fastest way to know what branch we are on is to use the `git branch` command. An asterisk will appear next to the name of the active branch.
+
+### Deleting a Branch
+
+* Once we've merged any changes from a branch back into the master branch, we'll want to delete the branch. 
+* We can delete a branch with the `-d` flag, so we'd type
+  * `git branch -d <name of branch to delete>`
+* Git won't let us delete a branch that has commits that aren't on any other branch. So if we create the `sidebar` branch, added commits to it, and then tried to delete it with `git branch -d sidebar`, Git would not let us.
+  * The only way to delete a branch with commits that aren't on another branch is to use the `-D` flag.
+
+## Merging
 
