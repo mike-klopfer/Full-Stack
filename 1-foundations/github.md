@@ -296,3 +296,72 @@ Imperative commit title (limited to 50 characters)
 
 ## Merging
 
+* Git can automatically combine the changes on different branches
+* How does merging work? See example below.
+  * When a merge happens, it makes a commit
+  * Wherever the head pointer is, the merge commit will be placed there, and that branch will move forward, with the same branch name
+  * In this example case, we'll see a **Regular Merge Commit**, which links two different earlier commits, with the `git merge sidebar` command
+    * This doesn't effect the sidebar branch, we can switch back to it and still make commits, BUT changes to Sidebar after the merge won't be propogated to Master until another merge.
+ 
+Before Merge 
+* Commit with SHA 1... is on the Master
+* Commit with SHA b... is on Sidebar 
+```
+             b--1   : Master (Head)
+e==2==a==3 <      
+             7--b      : Sidebar
+
+```
+After Merge
+* Commit 8... is on Master
+* Commits 7, b are on Master *AND* Sidebar
+```
+
+             b--1--8    : Master (Head)
+e==2==a==3 <     /
+             7==b      : Sidebar
+
+```
+* We could also have a **Fast-Forward Merge Commit**, if we have a branch with commits *ahead* of the master. In this type of merge, the Master branch pointer is just moved to point at the "future" commit in the more developed branch.
+
+### KNOW THE BRANCH
+
+* Its very imoprtant to know which branch you're on when you are about to merge branches together. Remember that making a merge makes a commit.
+
+### The Merge Command
+
+* The `git merge` command is used to combine Git branches:
+```
+$ git merge <name-of-branch-to-merge-with-current-active-branch>
+```
+
+* When a merge happens, Git will:
+  * look at the branches that it's going to merge
+  * consider the history of the branch's to find a single commit that *both* branches have in their commit history
+  * combine the lines of code that were changes on the separate branches
+    * generally speaking, Git will try to get all the features that were changed in both branches and include all of those changes into a single commit. If there is a conflict where the *SAME* line of code is changed in different ways in both branches, Git will have an error and will need programmer intervention to proceed. We'll cover this more later
+  * make a commit to record the merge
+
+* Fast-forward Merge
+  * This is basically a merge used to bring one branch up to speed with another branch which is ahead in development. In the example below, we have some feature in the `footer` branch (which has been developed further than our master branch), and now that we know everything in `footer` is working, we want to incorporate it into the master branch.
+  * A Fast-forward merge will just move the currently checked out branch *forward* unitl it points to the same commit that the other branch (in this case footer) is pointing to.
+  * We do this by switching to the `master` branch, then running `$ git merge footer`.
+  * The two diagrams below display the before and after of this type of merge:
+
+Before Fast-forward merge
+```
+e==2==a--3--z--7
+      |        |
+    master    footer
+```
+After Fast-forward merge
+```
+e==2==a==3==z==7
+               |
+              master,footer
+```
+
+* Regular Merge
+  * A regular merge combines two divergent branches
+  * The actual commant is very similar, and the result is diagrammed in the earlier **Merging** section.
+  * Its important to remember that whichever branch the HEAD pointer is pointing at, is the branch that will have the merge commit.
