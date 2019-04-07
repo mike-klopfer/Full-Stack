@@ -6,20 +6,20 @@
 
 * Setup
   * `git config`
-  * `git init`
+  * `git init` - initialize the current working directory as a git repository
 * Repository Status
-  * `git status`
-  * `git log`
+  * `git status` - get information about checked-out branch (where it is relative to the repository), and file status (files changed and staged)
+  * `git log` - get information about each commit (--oneline is a helpful flag)
   * `git diff`
 * Basic Committing
-  * `git add`
-  * `git reset`
-  * `git commit`
+  * `git add` - stage files for commit, can use grep syntax to stage multiple files
+  * `git reset` - unstage all files that are currently commited
+  * `git commit` - create a new commit with the currently staged files being updated, and all other files in the repository retaining their previous version
 * Taggging, Branching, Merging
-  * `git tag`
-  * `git branch` 
-  * `git merge`
-  * `git checkout`
+  * `git tag` - permanently demarcate a certain commit with a unique identifier (such as a version)
+  * `git branch` - create a compartmentalized section of the repository where files can be updated in isolation from other branches
+  * `git merge` - combine a named branch with the currently checked out (HEAD) branch
+  * `git checkout` - switch the HEAD pointer to a different branch
 
 ## What is Version Control
 
