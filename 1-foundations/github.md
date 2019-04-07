@@ -322,26 +322,18 @@ e==2==a==3 <     /
              7==b      : Sidebar
 
 ```
+
+Changes to Sidebar after the Merge
+* Commit 8 is on Master, but with old Sidebar changes
+* Commit 4 is on Sidebar, and these changes won't be on master until a future merge
+```
+
+             b--1--8    : Master (Head)
+e==2==a==3 <     /
+             7==b--4    : Sidebar
+
+```
 * We could also have a **Fast-Forward Merge Commit**, if we have a branch with commits *ahead* of the master. In this type of merge, the Master branch pointer is just moved to point at the "future" commit in the more developed branch.
-
-### KNOW THE BRANCH
-
-* Its very imoprtant to know which branch you're on when you are about to merge branches together. Remember that making a merge makes a commit.
-
-### The Merge Command
-
-* The `git merge` command is used to combine Git branches:
-```
-$ git merge <name-of-branch-to-merge-with-current-active-branch>
-```
-
-* When a merge happens, Git will:
-  * look at the branches that it's going to merge
-  * consider the history of the branch's to find a single commit that *both* branches have in their commit history
-  * combine the lines of code that were changes on the separate branches
-    * generally speaking, Git will try to get all the features that were changed in both branches and include all of those changes into a single commit. If there is a conflict where the *SAME* line of code is changed in different ways in both branches, Git will have an error and will need programmer intervention to proceed. We'll cover this more later
-  * make a commit to record the merge
-
 * Fast-forward Merge
   * This is basically a merge used to bring one branch up to speed with another branch which is ahead in development. In the example below, we have some feature in the `footer` branch (which has been developed further than our master branch), and now that we know everything in `footer` is working, we want to incorporate it into the master branch.
   * A Fast-forward merge will just move the currently checked out branch *forward* unitl it points to the same commit that the other branch (in this case footer) is pointing to.
@@ -361,7 +353,83 @@ e==2==a==3==z==7
               master,footer
 ```
 
+### Know the Branch
+
+* Its very imoprtant to know which branch you're on when you are about to merge branches together. Remember that making a merge makes a commit.
+
+### The Merge Command
+
+* The `git merge` command is used to combine Git branches:
+```
+$ git merge <name-of-branch-to-merge-with-current-active-branch>
+```
+
+* When a merge happens, Git will:
+  * look at the branches that it's going to merge
+  * consider the history of the branch's to find a single commit that *both* branches have in their commit history
+  * combine the lines of code that were changes on the separate branches
+    * generally speaking, Git will try to get all the features that were changed in both branches and include all of those changes into a single commit. If there is a conflict where the *SAME* line of code is changed in different ways in both branches, Git will have an error and will need programmer intervention to proceed. We'll cover this more later
+  * make a commit to record the merge
+
 * Regular Merge
   * A regular merge combines two divergent branches
   * The actual commant is very similar, and the result is diagrammed in the earlier **Merging** section.
   * Its important to remember that whichever branch the HEAD pointer is pointing at, is the branch that will have the merge commit.
+    * So looking at our sidebar branch example from earlier, lets assume we want to merge the sidebar branch into the master branch. We would do this by
+      1.  Swtich to the master branch with `$ git checkout master`
+      2.  Ensure we are on the correct branch with `$ git status`
+      3.  Merge in the desired branch with `$ git merge sidebar`
+    
+## Merge Conflicts
+
+* When a merge cannot be performed fully automatically this is called a **merge conflict**
+* When a merge conflict does occur, Git will combine as much as it can, but then it waill leave markers (`>>>` and `<<<`) that tell you what you need to manually fix
+
+### What causes a Merge Conflict
+
+* Git trakcs *lines* in files
+* A merge conflict will happen when the *exact same lines are changed in separate branches*
+  * For example, if you are ona `alternate-sidebar-style` branch and change the sidebar's head to "About Me" but then on a different branch you change the sidebar's heading to "Information About Me", which heading should Git choose?
+* Git will give us a status message telling us that a conflict has occurrred, and it will also tell us which file(s) have the conflict that we need to fix.
+
+### Merge Conflict Indicators Explanation
+* Once we open the file with a conflict, we'll see a number of things added to our file:
+  * `<<<<<< HEAD`: everyting below this line (until the next indicator) shows what is on the current branch
+  * `|||||| merged common ancestors`: everything below this line (until the next indicator) shows you waht the original lines were
+  * `=======` is the end of the original lines, everything that follows (until the next indicator) is what's on the branch that's being merged in
+  * `>>>>>>> heading-update` is the ending indicator of what's on the branch that's bein merged in (in this case, the `heading-update` branch)
+* Example: Lets assume we're making changes to the heading of a webpage in our project. We've been trying different titles, and at present we have the following structure:
+  * `e0` and previous commits are on the master branch
+  * `e6` and `f6` are on the `sidebar` branch
+  * `1a` is the commit created when `sidebar` was merged into `master`, and has the page heading "Adventure"
+  * `0c` sets the page heading to "Quest"
+  * `4c` is a new branch called `heading-update`, setting the page heading to "Crusade"
+```
+                   4c (heading-update)
+                  /
+(master) e0---- 1a -- 0c (master - HEAD)
+               /
+(sidbar) e6--f6 
+```
+* When we run `$ git merge heading-update` to attempt to merge in the heading-update branch to the master branch, we generate a conflict, and git tells us this by ouputting `CONFLICT` with a note about which file(s) are in conflict. Assume that our `index.html` file is the one with the problem. We open it up and see:
+```
+    <header>
+<<<<<<< HEAD
+        <h1>Quest</h1>
+||||||| merged common ancestors
+        <h1>Adventure</h1>
+=======
+        <h1>Crusade</h1>
+>>>>>>> heading-update
+        </header>
+```
+* In this case, the merge conflict indicators tell us that
+  * Since `1a` is the last common commit, the common ancestor is the heading "Adventure"
+  * Since `HEAD` currently points to the `master` branch, the most recent commit (`0c`) on this current branch has heading "Quest"
+  * The change we are merging in from `heading-update` is "Crusade"
+
+### Resolving a Merge Conflict
+* This is pretty straight forward. We need to:
+  * Choose which lines to keep
+  * Remove all lines with conflict indicators
+  * Add the file to the staging index and commit it! 
