@@ -30,7 +30,9 @@
   * Then when a connection comes in, the server runs a piece of code -like calling a function- to handle each incoming connection.
 * While our server was running it displayed a log with information related to each interaction with a client. In the next section we'll go in to detail on what the different parts of the log tell us.
 
+----------------------
 ## Parts of a URI
+
 * A web address is also called a URI (for Uniform Resource Identifier)
 * A URI is a name for a *resource*, such as a Wikipedia article, video on the web, or a data source like the Google Maps API.
   * This is similary but slightly different to a URL (Uniform Resource Locater). A URL is a URI for a resource on the network.
@@ -72,7 +74,7 @@
 * We've already seen **queries**, indicated with a `?q=<something>`
 * We can also have **fragments** which get a specific part of an HTML page, liked by HTML `id` tags
 
-
+----------------------
 ## Hostnames and Ports
 
 ### Hostnames
@@ -119,6 +121,7 @@ www.google.com has IPv6 address 2607:f8bo:4005:804::2004
 * When a server starts up and begins "listening" on a given port, its telling its operating system that it wants to receive connections from clients on a particular port number
   * When a client (such as a web browser) "connects to" that port and sends a request, the OS knows to forward that request to the sever that's listening on that port
 
+----------------------
 ## HTTP GET Requests
 
 * If we look at the server logs on the terminal where the demo server is running, when we request a page from the demo server, we get an entry like:
@@ -126,10 +129,53 @@ www.google.com has IPv6 address 2607:f8bo:4005:804::2004
 12.0.0.1 - - [08/Apr/2019 10:47:44] "GET /Untitled.ipynb HTTP/1.1" 200
 ```
 * Lets break this down to see what each part is telling us:
-  * `GET /Untitled.ipynb HTTP/1.1` - this is the text of the request line that the client (browser) sent to the server. This log entry is the server telling us that it received a request that literally said: "GET <some resource>"
+  * `GET /Untitled.ipynb HTTP/1.1` - this is the text of the request line that the client (browser) sent to the server. This log entry is the server telling us that it received a request that literally said: "GET [some resource]"
   * This request has multiple parts that we need to breakdown too:
     * The word `GET` is the **method** or **HTTP verb** being used. `GET` is used by a client when it wants a server to send a resource
     * `/Untitled.ipynb` is the **path** of the resource being requested. Notice that the client doesn't send the whole URI...just the path (which is relative to the server its requesting from)
     * Finally `HTTP/1.1` is the **protocol** of the request...HTTP/1.1 is the most common variety 
+* We can manually send requests to our server using `ncat`
+  * To do this, in a new terminal type `$ ncat 127.0.0.1 8000`
+  * Then on the new lines that appear type `GET / HTTP/1.1` [return] `Host: localhost` [return]x2
+  * We'll get back a response to this request, which we'll detail in the next section
 
+----------------------
 ## HTTP Responses
+* When we typed our request to the server in the last exercise (using `ncat` to connect) the result was quite a lot of text
+* This is an example of an **HTTP Response**
+  * One of these exchanges (request - response) is happening everytime our browser asks a server for a page
+* In the case of our example (and in the case of every HTTP response) there are three parts
+  1. Status Line - First line of text that the server sends back...can have one of several codes
+     * 1xx - Informational. The request is in progress or there's another step to take
+     * 2xx - Success! The request suceeded. The server is sending back the data the client asked for
+     * 3xx Redirection. The server is telling the client a different URI it should redirect to. The headers will ususally contain a Location header with the updated URI. Different codes tell the client whether the redirect is permanent or temporary
+     * 4xx Client error. The server didn't understand the client's request or can't or won't fill it. Different codes tell the client whether it was a bad URI, a permissions problem, or another sort of error.
+     * 5xx Server error. Something when wrong on the server side.
+  2. Headers - Other lines in the initial 'paragraph', up until the blank line
+     * An HTTP respons can include many headers
+     * Each header starts with a keyword, such as `Location` or `Content-type`, followed by a colon and a value.
+     * Headers are a sort of metadata for the response
+       * Not displayed by browsers or other clients, the tell the client various informatino about the response
+  3. Response Body - Everything after the blank line. In our example case it was a piece of HTML.
+* All together this will look something like...
+```
+HTTP/1.0 200 OK                                 <-- Status Line
+Server: SimpleHTTP/0.6 Python/3.5.5              [
+Date: Fri, 12 Apr 2019 13:36:31 GMT              |
+Content-type: text/html; charset=utf-8          <   Header
+Content-Length: 2966                             [
+                                                                {Below this is the Body}
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Directory listing for /</title>
+</head>
+<body>
+<h1>Directory listing for /</h1>
+<hr>
+<ul>
+<li><a href=".anaconda/">.anaconda/</a></li>
+<li><a href=".astropy/">.astropy/</a></li>
+...
+```
