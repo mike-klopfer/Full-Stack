@@ -1,4 +1,4 @@
-# Introductino to the Web from Python
+# Introduction to the Web from Python
 
 In our last lesson we started using Python's http.server module to help us understand the basics of how a server works and what it does. In this lesson we'll take a deeper look at http.server to help us better understand HTTP.
 
