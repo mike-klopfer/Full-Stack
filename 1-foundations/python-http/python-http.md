@@ -259,4 +259,53 @@ Lets try a more complicated form:
 This example takes the user in put in the "Search Term" field, and with a selection from dropdown "Corpus" (to choose which type of media to search), composes a GET request formatted to use Google search. Importantly, we note that the "form action" field tells the browser which URI to send the request to. 
 
 
+## GET and POST
+
+### Form methods: GET and POST
+
+When a browser submits a form via `GET` it puts all of the from fields into the URI that it sends to the server. These are sent as a query (we did this in the first exercise, previous lesson). They're all jammed together into a single line. Since they're all in the URI the user can bookmark the result, reload, etc.
+
+This is good for search engine queries, but not as good for posts on a comment board or an e-commerce shopping cart. As we've seen `GET` methods are fine for search forms and actions that are intended to *look something up*, but not as good for actions that are intended to alter or create a resource. For this sort of action, HTTP uses the verb `POST`.
+
+----
+### Idempotence
+
+An action is **idempotent** if doing it twice (or more) produces the same result as doing it once (Ex: *"Show me the search results for 'polar bear'"* is idempotent where as *"Add a polar bear to my shopping cart"* is not). 
+
+`POST` requests are not idempotent. If you've ever seen a warning from your browser asking if you really mean to resubmit a form, what its really asking is if you want to do a non-idempotent action a second time.
+
+----
+### Exercise: Be a server and receive a POST request
+
+Here is some HTML that sends a `POST` request to localhost 9999:
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Testing POST requests</title>
+    <style>
+        label, input, button {
+            margin: 8px;
+        }
+    </style>
+</head>
+<body>
+    <form action="http://localhost:9999/" method="POST">
+        <label>Magic input:
+            <input type="text" name="magic" value="mystery">
+        </label>
+        <br>
+        <label>Secret input:
+                <input type="text" name="secret" value="spooky">
+        </label>
+        <br>
+        <button type="submit">Do a thing!</button>
+    </form>
+</body>
+</html>
+```
+
 
