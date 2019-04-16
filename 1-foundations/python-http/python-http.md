@@ -179,6 +179,84 @@ And we see that we have the queries stored in a dictionarty, by using the parse_
 
 More details in the documentation for `urllib.parse.quote here: https://docs.python.org/3/library/urllib.parse.html#url-quoting. Translating URLs to the correct format makes them "URL-safe" or "URL-quoted" or "URL-encoded" or "URL-escaped" (terms used interchangably).
 
+## HTML and forms
+
+In most cases, users of a browser don't input their search queries (or other info) into a URI to accomplish a search, rather they input required items into an HTML form. This lesson will look at using forms to pass information to a server.
+
+### Exercise: HTML and forms
+
+Quick refresher on HTML forms here:
+https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms
+
+We open up the HTML in our browser by navigating to the directory where it is stored, and typing open [file name] at the command line. This piece of HTML for this exercise looks like this:
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Login Page</title>
+    <style>
+        label, input, button {
+            margin: 8px;
+        }
+    </style>
+</head>
+<body>
+    <form action="http://localhost:8000/" method="GET">
+        <h2>Login</h2>
+        <label for="username">Username:</label>
+        <input type="text" name="username" id="username">
+        <br>
+        <label for="pw">Password:</label>
+        <input type="password" name="pw" id="pw">
+        <br>
+        <button type=submit>Log in!</button>
+    </form>
+</body>
+</html>
+```
+Since the form action is on localhost port 8000, we can see the results by initializing our echo server on port 8000. The result is that any entries we make to the form fields "username" and "password" are simply displayed on the screen in the form of an HTML query. (Keeping in mind that the "GET" HTML method asks the server to GET a certain resource. HTTP 1.1 reformats this into the appropriate query, and passes it to the server, in this case our echo server, so this query is then echoed as output!)
+
+Lets try a more complicated form:
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Search wizardry!</title>
+    <style>
+        label, input, button {
+            margin: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <form action="http://www.google.com/search" method="GET">
+        <label>Search term:
+            <input type="text" name="q">
+        </label>
+        <br>
+        <label>Corpus:
+            <select name="tbm">
+                <option selected value="">Regular</option>
+                <option value="isch">Images</option>
+                <option value="bks">Books</option>
+                <option value="nws">News</option>
+            </select>
+        </label>
+        <br>
+        <button type="submit">Go go!</button>
+    </form>
+</body>
+</html>
+
+```
+This example takes the user in put in the "Search Term" field, and with a selection from dropdown "Corpus" (to choose which type of media to search), composes a GET request formatted to use Google search. Importantly, we note that the "form action" field tells the browser which URI to send the request to. 
 
 
 
