@@ -20,9 +20,9 @@ In our last lesson we started using Python's http.server module to help us under
 * We'll write some Python code to run a mini-web service, and it will need to:
   * Import `http:server`
   * Create a subclass of `http.server.BaseHTTPRequestHandler`. This is our **handler class**.
-  * Define a method on the handler calss for each **HTTP verb** you watn to handle
+  * Define a method on the handler class for each **HTTP verb** you want to handle
     * The mehtod for GET requests has to be called `do_GET`
-    * Inisde the method, call build-in methods of the handler class to read the HTTP request and write the response.
+    * Inisde the method, call built-in methods of the handler class to read the HTTP request and write the response.
   * Create an instance of `http.server.HTTPServer`, giving it your handler class and server information
   * Call the `HTTPServer` instance's `serve_forever` method.
   
@@ -74,7 +74,7 @@ The next thing the server needs to do is send a header section. In this case, we
 ----
 The last part of this writes the response body. The parent class gives us a variable called `self.wfile`, which is used to send the response. `wfile` stands for writeable file. Python makes an analogy between network connections and open files (they're things you can read and write data to).
 
-`self.wfile` represents the connection from the server to the client and it is write-only, hence the name. Any binary data written to it with its write method gets send to the client as part of the response. 
+`self.wfile` represents the connection from the server to the client and it is write-only, hence the name. Any binary data written to it with its write method gets sent to the client as part of the response. 
 ```python
 # Now, write the response body.
         self.wfile.write("Hello, HTTP!\n".encode())
@@ -88,7 +88,7 @@ if __name__ == '__main__':
     httpd.serve_forever()
 ```
 
-This code will run when we run this module as a Python program (vs. importing). The `HTTPServer` constructor needs to know what address and port to listen on (in this case all addresses on port 8000), taking these as a tuple `server_address`. The `HelloHandler` class is used to handle each incomeing client request. 
+This code will run when we run this module as a Python program (vs. importing). The `HTTPServer` constructor needs to know what address and port to listen on (in this case all addresses on port 8000), taking these as a tuple `server_address`. The `HelloHandler` class is used to handle each incoming client request. 
 
 At the very end, we call `serve_forever` on the instance of `HTTPServer`, telling it to start handling HTTP requests...and off it goes!
 
@@ -105,14 +105,14 @@ UTF-8 is the default encoding in Python, and this is what Python will use when w
 
 We'll modify our hello server to echo back whatever request path we send it...so for instance if we access the page `http://localhost:8000/bears`, we will see "bears" in the browser. We call this an **echo server**. 
 
-In order to do this, the servrer needs to be able to look at the request information. `http.server` can do this. 
+In order to do this, the server needs to be able to look at the request information. `http.server` can do this. 
 
 ### Exercise: Making the echo server
 
 We modify the HelloHandler code to make an EchoHandler. Here is the final code:
 
 ```python
-rom http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import HTTPServer, BaseHTTPRequestHandler
 
 
 class EchoHandler(BaseHTTPRequestHandler):
@@ -175,7 +175,7 @@ Finally, if we try to store these parts of the query, we do:
 >>> query
 {'q': ['gray squirrel'], 'tbm': ['isch']}
 ```
-And we see that we have the queries stored in a dictionarty, by using the parse_qs method that we imported. Note that when Python and `urllib.parse` store the queries in a dictionary, they automatically strip out some of the HTML encoding (replacing a `+` with a space for example). Things in URLs are formatted in very specific manner. 
+And we see that we have the queries stored in a dictionary, by using the parse_qs method that we imported. Note that when Python and `urllib.parse` store the queries in a dictionary, they automatically strip out some of the HTML encoding (replacing a `+` with a space for example). Things in URLs are formatted in very specific manner. 
 
 More details in the documentation for `urllib.parse.quote here: https://docs.python.org/3/library/urllib.parse.html#url-quoting. Translating URLs to the correct format makes them "URL-safe" or "URL-quoted" or "URL-encoded" or "URL-escaped" (terms used interchangably).
 
@@ -256,14 +256,14 @@ Lets try a more complicated form:
 </html>
 
 ```
-This example takes the user in put in the "Search Term" field, and with a selection from dropdown "Corpus" (to choose which type of media to search), composes a GET request formatted to use Google search. Importantly, we note that the "form action" field tells the browser which URI to send the request to. 
+This example takes the user input in the "Search Term" field, and with a selection from dropdown "Corpus" (to choose which type of media to search), composes a GET request formatted to use Google search. Importantly, we note that the "form action" field tells the browser which URI to send the request to. 
 
 
 ## GET and POST
 
 ### Form methods: GET and POST
 
-When a browser submits a form via `GET` it puts all of the from fields into the URI that it sends to the server. These are sent as a query (we did this in the first exercise, previous lesson). They're all jammed together into a single line. Since they're all in the URI the user can bookmark the result, reload, etc.
+When a browser submits a form via `GET` it puts all of the form fields into the URI that it sends to the server. These are sent as a query (we did this in the first exercise, previous lesson). They're all jammed together into a single line. Since they're all in the URI the user can bookmark the result, reload, etc.
 
 This is good for search engine queries, but not as good for posts on a comment board or an e-commerce shopping cart. As we've seen `GET` methods are fine for search forms and actions that are intended to *look something up*, but not as good for actions that are intended to alter or create a resource. For this sort of action, HTTP uses the verb `POST`.
 
@@ -307,5 +307,201 @@ Here is some HTML that sends a `POST` request to localhost 9999:
 </body>
 </html>
 ```
+If we listen on port 9999 with `$ ncat -l 9999`, we get the following:
+```
+POST / HTTP/1.1
+Host: localhost:9999
+Content-Type: application/x-www-form-urlencoded
+Origin: null
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/11.1.2 Safari/605.1.15
+Content-Length: 27
+Accept-Language: en-us
+Accept-Encoding: gzip, deflate
 
+magic=mystery&secret=spooky
+```
+
+ A few notes on this output:
+ * We notice that unlike a GET request, the browser has not encoded the data in the URI path like it does with a GET request
+ * Instead, it sends the form data in the request body, underneath the heades.
+
+## A server for POST
+
+In this lesson we'll be building a **messageboard server**. This server will be designed to host a messageboard which will display a form for writing messages as well as a list of previously written messages, and thus will need both GET and POST HTTP methods (GET for viewing messages, POST for submitting them).
+
+### POST handlers read the request body
+
+In an earlier lesson working on the HelloServer, we wrote some handler classes that had just a single method, `do_GET`. This handler will ned to have a `do_POST` method to support the required POST requests.
+
+Outline of methods:
+* `do_GET`
+  * Send the HTML form...and
+  * Send current messages
+* `do_POST`
+  * POST request implies that there is a new message
+  * Server will store the message in a list...and...
+  * REturn all the messages it's seen so far
+  * Remembering that the message to be posted will be in the request body of the HTTP reuqest, so `do_POST` will need to read the request body by calling the built-in `self.rfile.read` method.
+    * `self.rfile` is af file object, like the `self.wfile` we say earlier, except `rfile` is for reading the request, rather than writing the response
+    * `self.rfile.read` needs to be told how many bytes to read...in other words, how long the request body is...something like `self.rfile.read(140)`
+    * The browser will send the length of the request body in the `Content-Length` header
+
+### Headers are strings (or missing)
+
+In the previous section we discussed the requirement of our `do_POST` method to use `self.rfile.read(length)` to extract the message part of the HTTP request (in a POST request). This technique encounters two main difficulties:
+1. Extracting `Content-Length` from the HTTP request
+   * We handle this by using the instance variable `self.headers`
+   * This instance variable acts like a Python dictionary, where the keys are the header names, except they're case insensitive, so we can look up `content-length` or `Content-Length`
+   * The values in this dictionary are strings, we will need to convert these into integers in order for `self.rfile.read` to work correctly
+2. Its also possible that the HTTP request body will be empty, and the browser might not send a `Content-Length` at all
+   * Thus when accessing the headers from `self.headers` we should use the `.get` dictionary method (instead of a pure lookup...preventing a `KeyError`). 
+
+The following code snippet can be used in the `do_POST` handler to find the length of the request body and read it:
+
+```python
+length = int(self.header.get('Content-Length', 0))
+data = self.rfile.read(length).decode()
+```
+
+Once we've read the body we can use `urllib.parse.parse_qs` to extract the POST parameters
+
+### Messageboard Part One
+
+Here is the starter code, it is located in the Messageboard PartOne folder in this repository at `1-foundations/python-http/course-ud303/Lesson-02:
+```python
+from http.server import HTTPServer, BaseHTTPRequestHandler
+from urllib.parse import parse_qs
+
+
+class MessageHandler(BaseHTTPRequestHandler):
+    def do_POST(self):
+        # 1. How long was the message? (Use the Content-Length header.)
+
+        # 2. Read the correct amount of data from the request.
+
+        # 3. Extract the "message" field from the request data.
+
+        # Send the "message" field back as the response.
+        self.send_response(200)
+        self.send_header('Content-type', 'text/plain; charset=utf-8')
+        self.end_headers()
+        self.wfile.write(message.encode())
+
+if __name__ == '__main__':
+    server_address = ('', 8000)
+    httpd = HTTPServer(server_address, MessageHandler)
+    httpd.serve_forever()
+```
+
+I've created a local copy of this file which is just in the `python-http` folder
+
+1. First I used `self.headers.get('Content-Length',0))` in the `do_POST` method to get the length of the message. 
+   * One mistake I made during this step was calling `self.header` (incorrect) instead of `self.headers` (correct)
+2. Next I extracted and decoded the message with `self.rfile.read(length).decode()` 
+  * During this step I was unsure how to proceed with extracting only the message, so I passed the outcome from this step directly into a variable called `message` and just displayed the whole thing
+  * In this case, the only thing contained in the output was `message=[whatever stuff I typed in]`
+3. Since I was unsure exactly how to extract only the message, I used `urllib.parse.parse_qs` to change the HTTP message into a python dictionary.
+   * I tried to display the whole dictionary, but received an `AttributeError` since a dictionary doesn't have the `.encode()` method
+   * Based on the output during step 2 (`message=[stuff]`), I guessed that the key I'd need would be `message`
+     * This still returned an error, since data type returned by calling the key was a list...presumably a list of all the messages
+     * Since I only want the first message, I indexed `[0]`, and this produced the result I wanted.
+* Extra: I also slighly changed the import statements, to avoid using `from package-x import module-y` type syntax.
+
+Here is the code at the end of part one:
+
+```python
+from http.server import HTTPServer, BaseHTTPRequestHandler
+from urllib.parse import parse_qs
+
+
+class MessageHandler(BaseHTTPRequestHandler):
+    def do_POST(self):
+        # 1. How long was the message?
+        length = int(self.headers.get('Content-length', 0))
+
+        # 2. Read the correct amount of data from the request.
+        data = self.rfile.read(length).decode()
+
+        # 3. Extract the "message" field from the request data.
+        message = parse_qs(data)["message"][0]
+
+        # Send the "message" field back as the response.
+        self.send_response(200)
+        self.send_header('Content-type', 'text/plain; charset=utf-8')
+        self.end_headers()
+        self.wfile.write(message.encode())
+
+if __name__ == '__main__':
+    server_address = ('', 8000)
+    httpd = HTTPServer(server_address, MessageHandler)
+    httpd.serve_forever()
+```
+
+
+----
+
+### Messageboard Part Two
+
+I'll keep working from the same file that I started last exercise. In the previous exercise, we had to manually load the HTML form each time we wanted to use the form. In this exercise we'll modify our messageboard code so that it automatically serves the form. 
+
+We'll do this in two steps:
+1. Create a string variable which contains the HTML code we want to serve
+   * This part was easy...just grab the HTML text from Messageboard.html, and store it as a triple-quoted string in our python script. 
+2. Create a `do_GET` method that serves this form when the server is running.
+   * This was slightly more difficult. We had to do several steps
+     * Make do_GET method with appropriate items, including
+     * `self.wfile.write(msg_html.encode())`
+     * However, because I copied the formatting from the `do_POST` method, when I ran the server, it displayed the HTML as text
+       * This was because I had in the `self.send_header` the `Content-type` as `text/plain`
+       * Once I changed it to `HTML` everything worked
+
+Here is the code at the end of part two:
+```python
+import http.server as hs
+import urllib
+
+msg_html = '''
+<!DOCTYPE html>
+  <title>Message Board</title>
+  <form method="POST" action="http://localhost:8000/">
+    <textarea name="message"></textarea>
+    <br>
+    <button type="submit">Post it!</button>
+  </form>
+'''
+
+class MessageHandler(hs.BaseHTTPRequestHandler):
+    def do_POST(self):
+        # 1. How long was the message? (Use the Content-Length header.)
+        length = int(self.headers.get('Content-Length', 0))
+
+        # 2. Read the correct amount of data from the request.
+        data = self.rfile.read(length).decode()
+
+        # 3. Extract the "message" field from the request data.
+        message = urllib.parse.parse_qs(data)['message'][0]
+        
+        # Send the "message" field back as the response.
+        self.send_response(200)
+        self.send_header('Content-type', 'text/plain; charset=utf-8')
+        self.end_headers()
+        self.wfile.write(message.encode())
+
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header('Content-type', 'text/HTML; charset=utf-8')
+        self.end_headers()
+        self.wfile.write(msg_html.encode())
+
+
+if __name__ == '__main__':
+    server_address = ('', 8000)
+    httpd = hs.HTTPServer(server_address, MessageHandler)
+    httpd.serve_forever()
+```
+
+## Post-Redirect-Get
 
