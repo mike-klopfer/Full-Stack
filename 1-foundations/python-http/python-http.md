@@ -505,3 +505,102 @@ if __name__ == '__main__':
 
 ## Post-Redirect-Get
 
+This is a common design paradigm for interactive HTTP applications and API's. Here's the basic structure
+
+* A client `POST`s to a server to create or update a resource
+* On success, the server replies with a `303`
+* This redirect causes the client to `GET` the created or updated resource.
+
+For our messageboard server, Post-Redirect-Get entails the following:
+1. Go to http://localhost:8000/ in browser. Browser sends a `GET` request to teh server, which replies with a `200 OK` and a piece of HTML
+2. Write a comment in the form and submit it. The browser sends it via a `POST` to the server.
+3. THe server updates the list of comments, adding your comment to the lsit. Then it replies with a `303` redirect, setting the `Location: /` header to tell the browser to request the main page via `GET`.
+4. The redirect response causes the browser to go back to the same page we started with, sending a `GET` request, which replies with a `200 OK` and a piece of HTML...and so on
+
+### Exercise: Messagboard Part Three
+
+Update the messageboard server to a full Post-Redirect-Get pattern as described above. 
+
+Below is the code for the finished exercise and some notes on completing this exercise.
+
+1. Send a 303 redirect back to the root page.
+   * The key realizations here were: 
+     * Each separate type of header needs to have a distinct `self.send_header` line, and the first argument in this defines which type of header we're creating
+     * `Location: /` must be separated in the `.send_header` arguments
+
+2. Put the response together out of the HTML form and the stored messages
+   * For this I just looped over the stored messages, adding each message to a string `full_msg`
+   *  At the end of the long string of messages, I added the HTML form, so that it would always be displayed at the bottom of the page.
+     * I could have gotten more complicated with this (ex: Add in some HTML formatting between/around each message in the list to separate things out), but for now this meets the requirements of the exercise
+
+3. Send the response
+   * Simple...use `self.wfile.write` juse like we have in the past
+
+```python
+import http.server as hs
+import urllib
+
+memory = []
+
+msg_html = '''
+<!DOCTYPE html>
+  <title>Message Board</title>
+  <form method="POST" action="http://localhost:8000/">
+    <textarea name="message"></textarea>
+    <br>
+    <button type="submit">Post it!</button>
+  </form>
+'''
+
+class MessageHandler(hs.BaseHTTPRequestHandler):
+    def do_POST(self):
+        # How long was the message? (Use the Content-Length header.)
+        length = int(self.headers.get('Content-Length', 0))
+
+        # Read the correct amount of data from the request.
+        data = self.rfile.read(length).decode()
+
+        # Extract the "message" field from the request data.
+        message = urllib.parse.parse_qs(data)['message'][0]
+
+        # Escape HTML tags in the message so users can't break world
+        message = message.replace("<", "&lt;")
+
+        # Store it in memory.
+        memory.append(message)
+
+        # 1. Send a 303 redirect back to the root page.
+        self.send_response(303)
+        self.send_header('Content-type', 'text/HTML; charset=utf-8')
+        self.send_header('Location', '/')
+        self.end_headers
+
+        # Send the "message" field back as the response.
+        self.send_response(200)
+        self.send_header('Content-type', 'text/plain; charset=utf-8')
+        self.end_headers()
+        self.wfile.write(message.encode())
+    
+    def do_GET(self):
+        # First, send a 200 OK response.
+        self.send_response(200)
+
+        # Then send headers.
+        self.send_header('Content-type', 'text/html; charset=utf-8')
+        self.end_headers()
+
+        # 2. Put the response together out of the form and the stored messages.
+        full_msg = ''
+        for msg in memory:
+          full_msg = full_msg + '\n' + msg
+        
+        full_msg = full_msg + msg_html
+        # 3. Send the response.
+        self.wfile.write(full_msg.encode())
+
+if __name__ == '__main__':
+    server_address = ('', 8000)
+    httpd = hs.HTTPServer(server_address, MessageHandler)
+    httpd.serve_forever()
+
+```
