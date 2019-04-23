@@ -604,3 +604,74 @@ if __name__ == '__main__':
     httpd.serve_forever()
 
 ```
+
+## Making Requests
+
+Python has a module called `requests` which we can use to make HTTP requests in a straightforward way. The documentation for this module is here: https://2.python-requests.org//en/master/user/quickstart/
+
+A few things we learned in this section:
+* We can make a `GET` request with `requests.get(<URI here>)`
+* When we send a request, we get back a response object:
+```python
+>>> import requests
+>>> a = requests.get('http://www.udacity.com')
+>>> a
+<Response [200]>
+>>> type(a)
+<class 'requests.models.Response'>
+```
+* If we send request to a non-existent site we should get a Python Exception
+* If we send a request to a non-existent *page* on a real site, we should get a `.status_code` which is an HTTP error code (like 404)
+
+## Using a JSON API
+
+JSON is a compact and reaable data format based on the syntax of JavaScript, often used for web-based APIs. Many services let you send HTTP queries and get back structure data in JSON format. JSON data types are:
+* Strings
+* Numerics
+* Boolean - True/False
+* Arrays - An ordered list of 0 or more values, where each value many be of any type. (these are like Python lists)
+* Objects - An unordered collection of name:value pairs where names (also called keys) are strings, and values can be of any type. (analagous to a Python dictinoary)
+
+JSON data always starts and ends with curly brackets, here are examples of the data types:
+```json
+{
+    "title":"JSON Notes",       // string
+    "numCharacters":642,        // number
+    "finished":false,           // boolean
+    "topicCategories":[         // array
+        "Computer Science",
+        "Knowledge"
+    ],
+    "statistics":{              // object
+        "viewCount": 12603,
+        "numLines":"thirteen"
+    }
+}
+```
+Python has a built-in `json` module, and the `requests` module makes use of it. A `Response` object has a `.json` method; if the response data is JSON, you can call this method to translate the JSON data into a Pyhton dicitonary.
+
+### Exercise: Use JSON with UINames.com
+
+`UINames.com` is a website which produces imaginary user information, and can transmit it in JSON format. We'll use it to practice decoding JSON data, and extracting the parts we need. The solution code is below:
+```python
+import requests
+
+def SampleRecord():
+    r = requests.get("http://uinames.com/api?ext&region=United%20States",
+                     timeout=2.0)
+    # 1. Add a line of code here to decode JSON from the response.
+    resp = r.json()
+    
+    return "My name is {} {} and the PIN on my card is {}.".format(
+    # 2. Add the correct fields from the JSON data structure.
+    resp['name'],
+    resp['surname'],
+    resp['credit_card']['pin']
+    )
+
+if __name__ == '__main__':
+    print(SampleRecord())
+```
+
+
+
