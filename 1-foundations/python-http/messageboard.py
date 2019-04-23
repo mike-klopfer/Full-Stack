@@ -1,25 +1,5 @@
 #!/usr/bin/env python3
-#
-# Step one in building the messageboard server:
-# An echo server for POST requests.
-#
-# Instructions:
-#
-# This server should accept a POST request and return the value of the
-# "message" field in that request.
-#
-# You'll need to add three things to the do_POST method to make it work:
-#
-# 1. Find the length of the request data.
-# 2. Read the correct amount of request data.
-# 3. Extract the "message" field from the request data.
-#
-# When you're done, run this server and test it from your browser using the
-# Messageboard.html form.  Then run the test.py script to check it.
 
-#from http.server import HTTPServer, BaseHTTPRequestHandler
-
-#import http.server
 import http.server as hs
 import urllib
 
