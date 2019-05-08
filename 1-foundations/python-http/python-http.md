@@ -673,5 +673,133 @@ if __name__ == '__main__':
     print(SampleRecord())
 ```
 
+## The bookmark server
+
+In this exercise we make a bookmark server which takes as input a long URI and a short name that we'd like to use, and saves these together in a key:value relationship so that we can redirect to the long URI by sending a request for the short name to the server.
+
+In more detail the server needs to do three things, depending on what type of request it receives:
+1. On a GET request to the / path, it displays an HTML fomr with two fields. One field is where you put teh long URI you want to shorten. The other is where you put the short name you want to use for it. Submitting this form sends a POST to the server.
+2. On a POST request, the server looks for the two form fields in the request body. If it has those, it first checks the URI with `requests.get` to make sure that it actually exists (returns a 200). 
+   * If the URI exists, the server stores a dictionary entry mapping the short name ot the long URI, and returns an HTML page with a ling to the short version. 
+   * If the URI doesn't actually exist the server returns a 404 error page saying so
+   * If either of the two form fields is missiong, the server returns a 400 error page saying so.
+3. On a GET request to an existing short UIR, it looks up the corresponding long URI and serves a redirect to it.
+
+Here is the final solution code:
+
+```python
+#!/usr/bin/env python3
+
+import http.server
+import requests
+from urllib.parse import unquote, parse_qs
+
+memory = {}
+
+form = '''<!DOCTYPE html>
+<title>Bookmark Server</title>
+<form method="POST">
+    <label>Long URI:
+        <input name="longuri">
+    </label>
+    <br>
+    <label>Short name:
+        <input name="shortname">
+    </label>
+    <br>
+    <button type="submit">Save it!</button>
+</form>
+<p>URIs I know about:
+<pre>
+{}
+</pre>
+'''
 
 
+def CheckURI(uri, timeout=5):
+    '''Check whether this URI is reachable, i.e. does it return a 200 OK?
+
+    This function returns True if a GET request to uri returns a 200 OK, and
+    False if that GET request returns any other response, or doesn't return
+    (i.e. times out).
+    '''
+    # 1. Write this function.  Delete the following line.
+    try:
+        resp = requests.get(uri)
+        if resp.status_code == 200:
+            return True
+        else:
+            return False
+    except:
+        return False
+        
+class Shortener(http.server.BaseHTTPRequestHandler):
+    def do_GET(self):
+        # A GET request will either be for / (the root path) or for /some-name.
+        # Strip off the / and we have either empty string or a name.
+        name = unquote(self.path[1:])
+
+        if name:
+            if name in memory:
+                # 2. Send a 303 redirect to the long URI in memory[name]
+                self.send_response(303)
+                self.send_header('Content-type', 'text/HTML; charset=utf-8')
+                self.send_header('Location', memory[name])
+                self.end_headers()
+
+            else:
+                # We don't know that name! Send a 404 error.
+                self.send_response(404)
+                self.send_header('Content-type', 'text/plain; charset=utf-8')
+                self.end_headers()
+                self.wfile.write("I don't know '{}'.".format(name).encode())
+        else:
+            # Root path. Send the form.
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+            # List the known associations in the form.
+            known = "\n".join("{} : {}".format(key, memory[key])
+                              for key in sorted(memory.keys()))
+            self.wfile.write(form.format(known).encode())
+
+    def do_POST(self):
+        # Decode the form data.
+        length = int(self.headers.get('Content-length', 0))
+        body = self.rfile.read(length).decode()
+        params = parse_qs(body)
+
+        # Check that the user submitted the form fields.
+        if "longuri" not in params or "shortname" not in params:
+            # 3. Serve a 400 error with a useful message.
+            self.send_response(400)
+            self.send_header('Content-type', 'text/plain; charset=utf-8')
+            self.end_headers()
+            self.wfile.write("All fields are empty".encode())
+
+        longuri = params["longuri"][0]
+        shortname = params["shortname"][0]
+
+        if CheckURI(longuri):
+            # This URI is good!  Remember it under the specified name.
+            memory[shortname] = longuri
+
+            # 4. Serve a redirect to the root page (the form).
+            self.send_response(303)
+            self.send_header('Content-type', 'text/HTML; charset=utf-8')
+            self.send_header('Location', '/')
+            self.end_headers()
+        else:
+            # Didn't successfully fetch the long URI.
+
+            # 5. Send a 404 error with a useful message.
+            self.send_response(404)
+            self.send_header('Content-type','text/plain; charset=utf-8')
+            self.end_headers()
+            self.wfile.write('Could not fetch the long URI'.encode())
+
+if __name__ == '__main__':
+    server_address = ('', 8000)
+    httpd = http.server.HTTPServer(server_address, Shortener)
+    httpd.serve_forever()
+```
