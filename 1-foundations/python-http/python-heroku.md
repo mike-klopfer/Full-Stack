@@ -198,6 +198,9 @@ class NameHandler(BaseHTTPRequestHandler):
         # 1. Set the fields of the cookie.
         #    Give the cookie a value from the 'yourname' variable,
         #    a domain (localhost), and a max-age.
+        c['yourname'] = yourname
+        c['yourname']["max-age"] = 600
+        c['yourname']["domain"] = 'localhost'
 
         # Send a 303 back to the root page, with a cookie!
         self.send_response(303)  # redirect via GET
@@ -215,6 +218,9 @@ class NameHandler(BaseHTTPRequestHandler):
                 # 2. Extract and decode the cookie.
                 #    Get the cookie from the headers and extract its value
                 #    into a variable called 'name'.
+
+                in_cookie = cookies.SimpleCookie(self.headers["Cookie"])
+                name = in_cookie["yourname"].value
 
                 # Craft a message, escaping any HTML special chars in name.
                 message = "Hey there, " + html_escape(name)
@@ -238,5 +244,64 @@ if __name__ == '__main__':
     server_address = ('', 8000)
     httpd = HTTPServer(server_address, NameHandler)
     httpd.serve_forever()
-
 ```
+
+Notes on steps in CookieServer.py
+1. Set the fields of the cookie
+   * The cookie was created using the `http.cookies` class `SimpleCookie`, and the instance was assigned to instance variable `c`.
+   * In this instance, we assign to Name `yourname` and to Content the user input name from the HTML form at the `<input>` flag. 
+   * We also set the Domain to `localhost` and we give a `max-age` value
+   * The work of sending the cookie back to the server is done using the `.send_header('SetCookie',...)` line
+2. Extract and decode the cookie
+   * The default message is sent if `'cookie'` is not present in `self.headers`
+   * If `'cookie'` is present, we enter a try-except block
+     * This block tries to extract the Content (value) associated with the Name `yourname` cookie
+   * Once extracted we set the variable `name` to be the Content (Value) of the cookie with Name (key) `"yourname"`
+
+### DNS domains and cookie security
+
+A DNS domain links a particular hostname to a computer's IP address. It also indicates that the owner of that domain intends for that computer to be treated as part of that domain. 
+
+If an unscrupulous user could convince your browser that their server `evilbox` was part of (say) Facebook, and get you to request a Facebook URL from `evilbox` instead of from Facebook's real servers. Your browser would send your `facebook.com` cookies to `evilbox` along with that request. But these cookies are what prove your identity to Facebook, so the bad guy could use those cookies to access your Facebook account. 
+
+In short: if a bad guy can take control of your site's DNS domain, they can send all your web traffic to their evil server...and if the bad guy can fool users' browsers into sending that traffic their way, they can steal the users' cookies and reuse them to break into those users' accounts on your site.
+
+## HTTPS for security
+
+### What HTTPS does for you
+
+When a browser and server use HTTPS, they're still using the same protocol (HTTP), just over an encrypted connection. The encryption follows a standard protocol called Transport Layer Security, or  **TLS** for short. TLS does the following:
+* **Privacy**: TSL Keeps the connection private by encrtypring everything sent over it.
+* **Authentication**: TSL lets the browser authenticate the server, to prevent an imposter server from stealing cookies/data
+* **Integrity**: TSL checks that data sent over the connection has not been accidentally or delibrately modified or replaced.
+
+### Inspecting TLS on your service
+
+Our Heroku app was deployed to an address with an `https://` prefix. We can find more information about the TLS on various browsers by checking their documentation. (most browsers have a lock or shield icon in the web address bar to indicate a secure connection)
+
+### Keys and certificates
+
+Server-side configuration for TLS consists of two pieces of data:
+* Private key: Secret, held on the server and never leaves there
+* Certificate: Sent to every browser that connects to that server via TLS. 
+
+These two pieces of data are mathematically related to each other in a way that makes encryption possible. The server's certificate i sissued by an organization called a certificate authority (CA). The CA's job is to make sure that the server really is who it says it is (similar to what a notary does for documents).
+
+
+### How does TLS assure privacy?
+
+Data in the TLS certificate and the server's private key are mathematically related through a system called public-key cryptography. Wikipedia article here: https://en.wikipedia.org/wiki/Public-key_cryptography
+
+In short, the two endpoints (browser and server)can securely agree on a shared secret which allows them to encrypt the data sent between them so that only the other endpoint (and not any eavesdropper) can unscramble it.
+
+### How does TLS assure authentication?
+
+As previously discussed, the CA (certificate authority) issues certifications to the companies who actually run their domains (i.e. the CA would issue a cert for udacity.com to the company which actually runs that domain). Each certificate also contains metadata that syat what DNS domain the certificate is good for. When a browser connects to a particular server, if the TLS domain metadata doesn't match the DNS domain, the browser will reject the certificate and provide a warning.
+
+### How does TLS assure integrity
+
+Every request and response sent over a TLS connection is sent with a message authentication code that the other end of the connection can verify.
+
+
+## Beyond GET and POST
+
