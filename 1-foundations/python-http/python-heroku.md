@@ -305,3 +305,43 @@ Every request and response sent over a TLS connection is sent with a message aut
 
 ## Beyond GET and POST
 
+### `PUT` for creating resources
+
+The HTTP `PUT` method is used to create new resources by the client sending a request body with:
+* The URI path it wants to create
+* A piece of data to place at the given URI path
+  * Could be a file to be stored to disk or a record to add to a database
+* Server should respond with a `201 Created` status code if the `PUT` action was completed successfully
+
+After a successful `PUT`, a `GET` request to the given URI should return the newly created resource. One downside of `PUT` is that it has to be done in application code (e.g. JavaScript), whereas `POST` methods can be doen with just HTML on the client side.
+
+### `DELETE` for deleting things
+
+`DELETE` is basically the inverse of `PUT`. AFter a successful `DELETE`, further `GET` requests should return a `404 Not Found`.
+
+### `PATCH` for making changes
+
+`PATCH` expresses the idea of *patching* a resource...changing it in some well-defined way. HTTP doesn't specify a format for patching, so its up to the application to decide. One standardized format for `PATCH` requests is the JSON Patch format (which expresses changes to a piece of JSON data)...here: http://jsonpatch.com/
+
+### `HEAD`, `OPTIONS`, `TRACE` for debugging
+
+* `HEAD` works just like `GET`, except the server doesn't return any content -- just headers
+* `OPTIONS` can be used to find out what features the server supports
+* `TRACE` echoes back what the server received from the client -- but is often disabled for security reasons.
+  
+One general way to think about HTTP: URI's are the "nouns" and methods are the "verbs".
+
+## New developments in HTTP
+
+Notes on HTTP/2
+
+## Resources for HTTP
+
+* Mozilla Developer Network's HTTP index page:
+https://developer.mozilla.org/en-US/docs/Web/HTTP
+
+* Standards documents for HTTP/1.1: https://tools.ietf.org/html/rfc7230
+
+
+
+
